@@ -1,0 +1,1408 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BoardingHouse Finder - Find Your Perfect Stay</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+        .gradient-bg { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+        .card-hover { transition: all 0.3s ease; }
+        .card-hover:hover { transform: translateY(-5px); box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1); }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-lg sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0 flex items-center">
+                        <i class="fas fa-home text-2xl text-indigo-600 mr-2"></i>
+                        <span class="text-xl font-bold text-gray-900">BoardingHouse Finder</span>
+                    </div>
+                </div>
+                <div id="authButtons" class="flex items-center space-x-2 sm:space-x-4">
+                    <button onclick="showAuthModal('signin')" class="text-gray-700 hover:text-indigo-600 px-2 sm:px-3 py-2 rounded-md text-xs sm:text-sm font-medium transition-colors">
+                        Sign In
+                    </button>
+                    <button onclick="showAuthModal('signup')" class="bg-indigo-600 hover:bg-indigo-700 text-white px-3 sm:px-4 py-2 rounded-md text-xs sm:text-sm font-medium transition-colors">
+                        Get Started
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="gradient-bg text-white py-20">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <h1 class="text-4xl md:text-6xl font-bold mb-6">Find Your Perfect Boarding House</h1>
+            <p class="text-xl md:text-2xl mb-8 opacity-90">Connect students with quality accommodations. Get instant vacancy alerts.</p>
+            <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                <button onclick="showAuthModal('signup', 'student')" class="bg-white text-indigo-600 px-8 py-4 rounded-lg text-lg font-semibold hover:bg-gray-100 transition-colors card-hover">
+                    <i class="fas fa-graduation-cap mr-2"></i>I'm a Student
+                </button>
+                <button onclick="showAuthModal('signup', 'owner')" class="bg-indigo-800 text-white px-8 py-4 rounded-lg text-lg font-semibold hover:bg-indigo-900 transition-colors card-hover">
+                    <i class="fas fa-building mr-2"></i>I'm a Property Owner
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="py-20 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Why Choose Our Platform?</h2>
+                <p class="text-xl text-gray-600">Everything you need to find or list boarding house accommodations</p>
+            </div>
+            <div class="grid md:grid-cols-3 gap-8">
+                <div class="text-center p-6 card-hover">
+                    <div class="bg-indigo-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-search text-2xl text-indigo-600"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-2">Smart Search</h3>
+                    <p class="text-gray-600">Filter by price, location, amenities, and preferences to find exactly what you need.</p>
+                </div>
+                <div class="text-center p-6 card-hover">
+                    <div class="bg-green-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-bell text-2xl text-green-600"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-2">Instant Alerts</h3>
+                    <p class="text-gray-600">Get notified via email and SMS when new vacancies match your criteria.</p>
+                </div>
+                <div class="text-center p-6 card-hover">
+                    <div class="bg-purple-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-shield-alt text-2xl text-purple-600"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-2">Verified Listings</h3>
+                    <p class="text-gray-600">All properties are verified and moderated for quality and authenticity.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Auth Modal -->
+    <div id="authModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-lg max-w-md w-full max-h-screen overflow-y-auto">
+            <div class="p-6">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 id="modalTitle" class="text-2xl font-bold text-gray-900">Sign In</h2>
+                    <button onclick="closeAuthModal()" class="text-gray-400 hover:text-gray-600">
+                        <i class="fas fa-times text-xl"></i>
+                    </button>
+                </div>
+
+                <!-- Role Selection (for signup) -->
+                <div id="roleSelection" class="hidden mb-6">
+                    <p class="text-gray-600 mb-4">I am a:</p>
+                    <div class="grid grid-cols-2 gap-4">
+                        <button onclick="selectRole('student')" id="studentRole" class="p-4 border-2 border-gray-200 rounded-lg text-center hover:border-indigo-500 transition-colors">
+                            <i class="fas fa-graduation-cap text-2xl text-indigo-600 mb-2"></i>
+                            <div class="font-semibold">Student</div>
+                            <div class="text-sm text-gray-500">Looking for accommodation</div>
+                        </button>
+                        <button onclick="selectRole('owner')" id="ownerRole" class="p-4 border-2 border-gray-200 rounded-lg text-center hover:border-indigo-500 transition-colors">
+                            <i class="fas fa-building text-2xl text-green-600 mb-2"></i>
+                            <div class="font-semibold">Property Owner</div>
+                            <div class="text-sm text-gray-500">Listing properties</div>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Auth Form -->
+                <form id="authForm" onsubmit="handleAuth(event)">
+                    <div class="space-y-4">
+                        <div id="nameField" class="hidden">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
+                            <input type="text" id="fullName" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                            <input type="email" id="email" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Password</label>
+                            <div class="relative">
+                                <input type="password" id="password" required class="w-full px-3 py-2 pr-10 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                <button type="button" onclick="togglePassword('password')" class="absolute inset-y-0 right-0 pr-3 flex items-center">
+                                    <i id="passwordIcon" class="fas fa-eye-slash text-gray-400 hover:text-gray-600"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div id="confirmPasswordField" class="hidden">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Confirm Password</label>
+                            <div class="relative">
+                                <input type="password" id="confirmPassword" class="w-full px-3 py-2 pr-10 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                <button type="button" onclick="togglePassword('confirmPassword')" class="absolute inset-y-0 right-0 pr-3 flex items-center">
+                                    <i id="confirmPasswordIcon" class="fas fa-eye-slash text-gray-400 hover:text-gray-600"></i>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- Password Requirements (for signup) -->
+                        <div id="passwordRequirements" class="hidden mt-2 p-3 bg-gray-50 rounded-md">
+                            <p class="text-sm font-medium text-gray-700 mb-2">Password must contain:</p>
+                            <div class="space-y-1 text-xs">
+                                <div id="req-length" class="flex items-center text-red-600">
+                                    <i class="fas fa-times mr-2"></i>At least 8 characters
+                                </div>
+                                <div id="req-uppercase" class="flex items-center text-red-600">
+                                    <i class="fas fa-times mr-2"></i>One uppercase letter
+                                </div>
+                                <div id="req-lowercase" class="flex items-center text-red-600">
+                                    <i class="fas fa-times mr-2"></i>One lowercase letter
+                                </div>
+                                <div id="req-number" class="flex items-center text-red-600">
+                                    <i class="fas fa-times mr-2"></i>One number
+                                </div>
+                                <div id="req-special" class="flex items-center text-red-600">
+                                    <i class="fas fa-times mr-2"></i>One special character (!@#$%^&*)
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Password Match Indicator -->
+                        <div id="passwordMatch" class="hidden mt-2 text-sm">
+                            <div id="matchIndicator" class="flex items-center text-red-600">
+                                <i class="fas fa-times mr-2"></i>Passwords do not match
+                            </div>
+                        </div>
+                    </div>
+                    <button type="submit" id="submitButton" class="w-full bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700 transition-colors mt-6 disabled:bg-gray-400 disabled:cursor-not-allowed">
+                        <span id="submitText">Sign In</span>
+                    </button>
+                </form>
+
+                <div class="mt-4 text-center">
+                    <button onclick="toggleAuthMode()" id="toggleButton" class="text-indigo-600 hover:text-indigo-800">
+                        Don't have an account? Sign up
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Student Dashboard (Hidden by default) -->
+    <div id="studentDashboard" class="hidden">
+        <nav class="bg-white shadow-lg">
+            <div class="max-w-7xl mx-auto px-2 sm:px-4 lg:px-8">
+                <div class="flex justify-between items-center h-14 sm:h-16">
+                    <div class="flex items-center space-x-2 sm:space-x-4">
+                        <button onclick="showSection('search')" class="text-gray-700 hover:text-indigo-600 px-2 py-1 text-xs sm:text-sm">
+                            <i class="fas fa-search sm:mr-1"></i><span class="hidden sm:inline">Search</span>
+                        </button>
+                        <button onclick="showSection('favorites')" class="text-gray-700 hover:text-indigo-600 px-2 py-1 text-xs sm:text-sm">
+                            <i class="fas fa-heart sm:mr-1"></i><span class="hidden sm:inline">Favorites</span>
+                        </button>
+                        <button onclick="showSection('alerts')" class="text-gray-700 hover:text-indigo-600 px-2 py-1 text-xs sm:text-sm">
+                            <i class="fas fa-bell sm:mr-1"></i><span class="hidden sm:inline">Alerts</span>
+                        </button>
+                    </div>
+                    <div class="relative">
+                        <button onclick="toggleUserMenu()" class="flex items-center text-gray-700 hover:text-indigo-600 p-1">
+                            <i class="fas fa-user-circle text-xl sm:text-2xl"></i>
+                        </button>
+                        <div id="userMenu" class="hidden absolute right-0 mt-2 w-40 sm:w-48 bg-white rounded-md shadow-lg py-1 z-50">
+                            <button onclick="showSection('profile')" class="block px-3 py-2 text-xs sm:text-sm text-gray-700 hover:bg-gray-100 w-full text-left">
+                                <i class="fas fa-user mr-2"></i>Profile
+                            </button>
+                            <button onclick="showSection('settings')" class="block px-3 py-2 text-xs sm:text-sm text-gray-700 hover:bg-gray-100 w-full text-left">
+                                <i class="fas fa-cog mr-2"></i>Settings
+                            </button>
+                            <button onclick="logout()" class="block px-3 py-2 text-xs sm:text-sm text-gray-700 hover:bg-gray-100 w-full text-left">
+                                <i class="fas fa-sign-out-alt mr-2"></i>Logout
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Student Search Section -->
+        <div id="searchSection" class="p-3 sm:p-6">
+            <div class="max-w-7xl mx-auto">
+                <h1 class="text-xl sm:text-3xl font-bold text-gray-900 mb-4 sm:mb-6">Find Your Perfect Boarding House</h1>
+                
+                <!-- Search Filters -->
+                <div class="bg-white rounded-lg shadow-md p-3 sm:p-6 mb-6">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+                        <div>
+                            <label class="block text-xs sm:text-sm font-medium text-gray-700 mb-1">Location</label>
+                            <input type="text" placeholder="Enter city or area" class="w-full px-2 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                        </div>
+                        <div>
+                            <label class="block text-xs sm:text-sm font-medium text-gray-700 mb-1">Max Price</label>
+                            <select class="w-full px-2 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                <option>Any Price</option>
+                                <option>Under ₱500</option>
+                                <option>₱500 - ₱800</option>
+                                <option>₱800 - ₱1200</option>
+                                <option>Over ₱1200</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs sm:text-sm font-medium text-gray-700 mb-1">Room Type</label>
+                            <select class="w-full px-2 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                <option>Any Type</option>
+                                <option>Single Room</option>
+                                <option>Shared Room</option>
+                                <option>Studio</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs sm:text-sm font-medium text-gray-700 mb-1">Gender</label>
+                            <select class="w-full px-2 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                <option>Any</option>
+                                <option>Male Only</option>
+                                <option>Female Only</option>
+                                <option>Mixed</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="mt-3 sm:mt-4 grid grid-cols-2 sm:flex sm:flex-wrap gap-2 text-sm">
+                        <label class="flex items-center">
+                            <input type="checkbox" class="mr-1 sm:mr-2"> WiFi
+                        </label>
+                        <label class="flex items-center">
+                            <input type="checkbox" class="mr-1 sm:mr-2"> Laundry
+                        </label>
+                        <label class="flex items-center">
+                            <input type="checkbox" class="mr-1 sm:mr-2"> Parking
+                        </label>
+                        <label class="flex items-center">
+                            <input type="checkbox" class="mr-1 sm:mr-2"> Kitchen
+                        </label>
+                    </div>
+                    <button class="mt-3 sm:mt-4 w-full sm:w-auto bg-indigo-600 text-white px-4 sm:px-6 py-2 rounded-md hover:bg-indigo-700 transition-colors text-sm">
+                        <i class="fas fa-search mr-2"></i>Search Properties
+                    </button>
+                </div>
+
+                <!-- Search Results -->
+                <div id="searchResults" class="text-center py-12">
+                    <div class="text-gray-400 mb-4">
+                        <i class="fas fa-search text-6xl"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-600 mb-2">No search performed yet</h3>
+                    <p class="text-gray-500">Use the filters above to find boarding houses that match your preferences.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Student Settings Section -->
+        <div id="settingsSection" class="hidden p-3 sm:p-6">
+            <div class="max-w-4xl mx-auto">
+                <h1 class="text-xl sm:text-3xl font-bold text-gray-900 mb-4 sm:mb-6">Settings</h1>
+                
+                <!-- Settings Categories -->
+                <div class="grid md:grid-cols-3 gap-6">
+                    <!-- Appearance Settings -->
+                    <div class="bg-white rounded-lg shadow-md p-4 sm:p-6">
+                        <h3 class="text-lg font-semibold mb-4 flex items-center">
+                            <i class="fas fa-palette text-indigo-600 mr-2"></i>Appearance
+                        </h3>
+                        <div class="space-y-4">
+                            <div>
+                                <label class="flex items-center justify-between">
+                                    <span class="text-sm font-medium text-gray-700">Dark Mode</span>
+                                    <div class="relative">
+                                        <input type="checkbox" id="darkMode" class="sr-only" onchange="toggleDarkMode()">
+                                        <div class="w-10 h-6 bg-gray-200 rounded-full shadow-inner cursor-pointer" onclick="document.getElementById('darkMode').click()">
+                                            <div id="darkModeToggle" class="w-4 h-4 bg-white rounded-full shadow transform transition-transform duration-200 ease-in-out translate-x-1 mt-1"></div>
+                                        </div>
+                                    </div>
+                                </label>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Font Size</label>
+                                <select class="w-full px-3 py-2 text-sm border border-gray-300 rounded-md">
+                                    <option>Small</option>
+                                    <option selected>Medium</option>
+                                    <option>Large</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Language</label>
+                                <select class="w-full px-3 py-2 text-sm border border-gray-300 rounded-md">
+                                    <option selected>English</option>
+                                    <option>Filipino</option>
+                                    <option>Spanish</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Notification Settings -->
+                    <div class="bg-white rounded-lg shadow-md p-4 sm:p-6">
+                        <h3 class="text-lg font-semibold mb-4 flex items-center">
+                            <i class="fas fa-bell text-yellow-600 mr-2"></i>Notifications
+                        </h3>
+                        <div class="space-y-4">
+                            <div>
+                                <label class="flex items-center justify-between">
+                                    <span class="text-sm font-medium text-gray-700">Email Alerts</span>
+                                    <input type="checkbox" checked class="w-4 h-4 text-indigo-600 rounded">
+                                </label>
+                            </div>
+                            <div>
+                                <label class="flex items-center justify-between">
+                                    <span class="text-sm font-medium text-gray-700">SMS Notifications</span>
+                                    <input type="checkbox" checked class="w-4 h-4 text-indigo-600 rounded">
+                                </label>
+                            </div>
+                            <div>
+                                <label class="flex items-center justify-between">
+                                    <span class="text-sm font-medium text-gray-700">New Property Alerts</span>
+                                    <input type="checkbox" checked class="w-4 h-4 text-indigo-600 rounded">
+                                </label>
+                            </div>
+                            <div>
+                                <label class="flex items-center justify-between">
+                                    <span class="text-sm font-medium text-gray-700">Price Drop Alerts</span>
+                                    <input type="checkbox" class="w-4 h-4 text-indigo-600 rounded">
+                                </label>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Alert Frequency</label>
+                                <select class="w-full px-3 py-2 text-sm border border-gray-300 rounded-md">
+                                    <option selected>Immediately</option>
+                                    <option>Daily Digest</option>
+                                    <option>Weekly Summary</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Privacy & Security -->
+                    <div class="bg-white rounded-lg shadow-md p-4 sm:p-6">
+                        <h3 class="text-lg font-semibold mb-4 flex items-center">
+                            <i class="fas fa-shield-alt text-green-600 mr-2"></i>Privacy & Security
+                        </h3>
+                        <div class="space-y-4">
+                            <div>
+                                <label class="flex items-center justify-between">
+                                    <span class="text-sm font-medium text-gray-700">Profile Visibility</span>
+                                    <input type="checkbox" checked class="w-4 h-4 text-indigo-600 rounded">
+                                </label>
+                            </div>
+                            <div>
+                                <label class="flex items-center justify-between">
+                                    <span class="text-sm font-medium text-gray-700">Show Contact Info</span>
+                                    <input type="checkbox" class="w-4 h-4 text-indigo-600 rounded">
+                                </label>
+                            </div>
+                            <div>
+                                <label class="flex items-center justify-between">
+                                    <span class="text-sm font-medium text-gray-700">Two-Factor Auth</span>
+                                    <input type="checkbox" class="w-4 h-4 text-indigo-600 rounded">
+                                </label>
+                            </div>
+                            <button class="w-full bg-red-600 text-white px-4 py-2 rounded-md text-sm hover:bg-red-700 transition-colors">
+                                Change Password
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Additional Settings -->
+                <div class="mt-6 bg-white rounded-lg shadow-md p-4 sm:p-6">
+                    <h3 class="text-lg font-semibold mb-4 flex items-center">
+                        <i class="fas fa-cog text-gray-600 mr-2"></i>System Preferences
+                    </h3>
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Default Search Radius</label>
+                                <select class="w-full px-3 py-2 text-sm border border-gray-300 rounded-md">
+                                    <option>5 km</option>
+                                    <option selected>10 km</option>
+                                    <option>25 km</option>
+                                    <option>50 km</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Currency</label>
+                                <select class="w-full px-3 py-2 text-sm border border-gray-300 rounded-md">
+                                    <option selected>Philippine Peso (₱)</option>
+                                    <option>US Dollar ($)</option>
+                                    <option>Euro (€)</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="flex items-center justify-between">
+                                    <span class="text-sm font-medium text-gray-700">Auto-save Searches</span>
+                                    <input type="checkbox" checked class="w-4 h-4 text-indigo-600 rounded">
+                                </label>
+                            </div>
+                        </div>
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Map Provider</label>
+                                <select class="w-full px-3 py-2 text-sm border border-gray-300 rounded-md">
+                                    <option selected>Google Maps</option>
+                                    <option>OpenStreetMap</option>
+                                    <option>Mapbox</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="flex items-center justify-between">
+                                    <span class="text-sm font-medium text-gray-700">Location Services</span>
+                                    <input type="checkbox" checked class="w-4 h-4 text-indigo-600 rounded">
+                                </label>
+                            </div>
+                            <div>
+                                <label class="flex items-center justify-between">
+                                    <span class="text-sm font-medium text-gray-700">Analytics & Cookies</span>
+                                    <input type="checkbox" class="w-4 h-4 text-indigo-600 rounded">
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Save Button -->
+                <div class="mt-6 flex justify-end">
+                    <button onclick="saveSettings()" class="bg-indigo-600 text-white px-6 py-2 rounded-md hover:bg-indigo-700 transition-colors">
+                        Save All Settings
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Student Profile Section -->
+        <div id="profileSection" class="hidden p-3 sm:p-6">
+            <div class="max-w-4xl mx-auto">
+                <h1 class="text-xl sm:text-3xl font-bold text-gray-900 mb-4 sm:mb-6">My Profile</h1>
+                <div class="bg-white rounded-lg shadow-md p-3 sm:p-6">
+                    <div class="flex items-center mb-6">
+                        <div class="w-20 h-20 bg-indigo-100 rounded-full flex items-center justify-center mr-4">
+                            <i class="fas fa-user text-3xl text-indigo-600"></i>
+                        </div>
+                        <div>
+                            <h2 class="text-2xl font-semibold" id="studentName">John Doe</h2>
+                            <p class="text-gray-600" id="studentEmail">john.doe@email.com</p>
+                            <p class="text-sm text-gray-500">Student • Member since 2024</p>
+                        </div>
+                    </div>
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div>
+                            <h3 class="text-lg font-semibold mb-3">Personal Information</h3>
+                            <div class="space-y-3">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700">Phone Number</label>
+                                    <input type="tel" value="+1 (555) 123-4567" class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700">University</label>
+                                    <input type="text" value="State University" class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700">Year of Study</label>
+                                    <select class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md">
+                                        <option>Freshman</option>
+                                        <option selected>Sophomore</option>
+                                        <option>Junior</option>
+                                        <option>Senior</option>
+                                        <option>Graduate</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-semibold mb-3">Preferences</h3>
+                            <div class="space-y-3">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700">Budget Range</label>
+                                    <select class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md">
+                                        <option>Under ₱500</option>
+                                        <option selected>₱500 - ₱800</option>
+                                        <option>₱800 - ₱1200</option>
+                                        <option>Over ₱1200</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700">Preferred Room Type</label>
+                                    <select class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md">
+                                        <option selected>Single Room</option>
+                                        <option>Shared Room</option>
+                                        <option>Studio</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700">Gender Preference</label>
+                                    <select class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md">
+                                        <option>Any</option>
+                                        <option>Male Only</option>
+                                        <option selected>Female Only</option>
+                                        <option>Mixed</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <button class="mt-6 bg-indigo-600 text-white px-6 py-2 rounded-md hover:bg-indigo-700 transition-colors">
+                        Save Changes
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Owner Dashboard (Hidden by default) -->
+    <div id="ownerDashboard" class="hidden">
+        <nav class="bg-white shadow-lg">
+            <div class="max-w-7xl mx-auto px-2 sm:px-4 lg:px-8">
+                <div class="flex justify-between items-center h-14 sm:h-16">
+                    <div class="flex items-center space-x-1 sm:space-x-3">
+                        <button onclick="showOwnerSection('dashboard')" class="text-gray-700 hover:text-green-600 px-2 py-1 text-xs sm:text-sm">
+                            <i class="fas fa-chart-bar sm:mr-1"></i><span class="hidden sm:inline">Dashboard</span>
+                        </button>
+                        <button onclick="showOwnerSection('listings')" class="text-gray-700 hover:text-green-600 px-2 py-1 text-xs sm:text-sm">
+                            <i class="fas fa-building sm:mr-1"></i><span class="hidden sm:inline">Listings</span>
+                        </button>
+                        <button onclick="showOwnerSection('add-listing')" class="bg-green-600 text-white px-2 py-1 rounded text-xs sm:text-sm hover:bg-green-700">
+                            <i class="fas fa-plus sm:mr-1"></i><span class="hidden sm:inline">Add</span>
+                        </button>
+                    </div>
+                    <div class="relative">
+                        <button onclick="toggleOwnerMenu()" class="flex items-center text-gray-700 hover:text-green-600 p-1">
+                            <i class="fas fa-user-circle text-xl sm:text-2xl"></i>
+                        </button>
+                        <div id="ownerMenu" class="hidden absolute right-0 mt-2 w-40 sm:w-48 bg-white rounded-md shadow-lg py-1 z-50">
+                            <button onclick="showOwnerSection('owner-profile')" class="block px-3 py-2 text-xs sm:text-sm text-gray-700 hover:bg-gray-100 w-full text-left">
+                                <i class="fas fa-user mr-2"></i>Profile
+                            </button>
+                            <button onclick="showOwnerSection('owner-settings')" class="block px-3 py-2 text-xs sm:text-sm text-gray-700 hover:bg-gray-100 w-full text-left">
+                                <i class="fas fa-cog mr-2"></i>Settings
+                            </button>
+                            <button onclick="logout()" class="block px-3 py-2 text-xs sm:text-sm text-gray-700 hover:bg-gray-100 w-full text-left">
+                                <i class="fas fa-sign-out-alt mr-2"></i>Logout
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Owner Dashboard Section -->
+        <div id="ownerDashboardSection" class="p-3 sm:p-6">
+            <div class="max-w-7xl mx-auto">
+                <h1 class="text-xl sm:text-3xl font-bold text-gray-900 mb-4 sm:mb-6">Property Management Dashboard</h1>
+                
+                <!-- Stats Cards -->
+                <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6 mb-6 sm:mb-8">
+                    <div class="bg-white rounded-lg shadow-md p-3 sm:p-6">
+                        <div class="flex items-center">
+                            <div class="bg-blue-100 p-2 sm:p-3 rounded-full">
+                                <i class="fas fa-building text-blue-600 text-sm sm:text-xl"></i>
+                            </div>
+                            <div class="ml-2 sm:ml-4">
+                                <p class="text-xs sm:text-sm text-gray-600">Properties</p>
+                                <p class="text-lg sm:text-2xl font-bold text-gray-900">0</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-lg shadow-md p-3 sm:p-6">
+                        <div class="flex items-center">
+                            <div class="bg-green-100 p-2 sm:p-3 rounded-full">
+                                <i class="fas fa-check-circle text-green-600 text-sm sm:text-xl"></i>
+                            </div>
+                            <div class="ml-2 sm:ml-4">
+                                <p class="text-xs sm:text-sm text-gray-600">Available</p>
+                                <p class="text-lg sm:text-2xl font-bold text-gray-900">0</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-lg shadow-md p-3 sm:p-6">
+                        <div class="flex items-center">
+                            <div class="bg-yellow-100 p-2 sm:p-3 rounded-full">
+                                <i class="fas fa-eye text-yellow-600 text-sm sm:text-xl"></i>
+                            </div>
+                            <div class="ml-2 sm:ml-4">
+                                <p class="text-xs sm:text-sm text-gray-600">Views</p>
+                                <p class="text-lg sm:text-2xl font-bold text-gray-900">0</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-lg shadow-md p-3 sm:p-6">
+                        <div class="flex items-center">
+                            <div class="bg-purple-100 p-2 sm:p-3 rounded-full">
+                                <i class="fas fa-dollar-sign text-purple-600 text-sm sm:text-xl"></i>
+                            </div>
+                            <div class="ml-2 sm:ml-4">
+                                <p class="text-xs sm:text-sm text-gray-600">Revenue</p>
+                                <p class="text-lg sm:text-2xl font-bold text-gray-900">₱0</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Activity -->
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h2 class="text-xl font-semibold mb-4">Recent Activity</h2>
+                    <div class="text-center py-8">
+                        <div class="text-gray-400 mb-4">
+                            <i class="fas fa-clock text-4xl"></i>
+                        </div>
+                        <h3 class="text-lg font-semibold text-gray-600 mb-2">No recent activity</h3>
+                        <p class="text-gray-500">Activity will appear here once you start listing properties and receiving inquiries.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Owner Settings Section -->
+        <div id="ownerSettingsSection" class="hidden p-3 sm:p-6">
+            <div class="max-w-4xl mx-auto">
+                <h1 class="text-xl sm:text-3xl font-bold text-gray-900 mb-4 sm:mb-6">Settings</h1>
+                
+                <!-- Settings Categories -->
+                <div class="grid md:grid-cols-3 gap-6">
+                    <!-- Appearance Settings -->
+                    <div class="bg-white rounded-lg shadow-md p-4 sm:p-6">
+                        <h3 class="text-lg font-semibold mb-4 flex items-center">
+                            <i class="fas fa-palette text-green-600 mr-2"></i>Appearance
+                        </h3>
+                        <div class="space-y-4">
+                            <div>
+                                <label class="flex items-center justify-between">
+                                    <span class="text-sm font-medium text-gray-700">Dark Mode</span>
+                                    <div class="relative">
+                                        <input type="checkbox" id="ownerDarkMode" class="sr-only" onchange="toggleOwnerDarkMode()">
+                                        <div class="w-10 h-6 bg-gray-200 rounded-full shadow-inner cursor-pointer" onclick="document.getElementById('ownerDarkMode').click()">
+                                            <div id="ownerDarkModeToggle" class="w-4 h-4 bg-white rounded-full shadow transform transition-transform duration-200 ease-in-out translate-x-1 mt-1"></div>
+                                        </div>
+                                    </div>
+                                </label>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Dashboard Layout</label>
+                                <select class="w-full px-3 py-2 text-sm border border-gray-300 rounded-md">
+                                    <option selected>Grid View</option>
+                                    <option>List View</option>
+                                    <option>Compact View</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Language</label>
+                                <select class="w-full px-3 py-2 text-sm border border-gray-300 rounded-md">
+                                    <option selected>English</option>
+                                    <option>Filipino</option>
+                                    <option>Spanish</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Business Notifications -->
+                    <div class="bg-white rounded-lg shadow-md p-4 sm:p-6">
+                        <h3 class="text-lg font-semibold mb-4 flex items-center">
+                            <i class="fas fa-bell text-yellow-600 mr-2"></i>Business Alerts
+                        </h3>
+                        <div class="space-y-4">
+                            <div>
+                                <label class="flex items-center justify-between">
+                                    <span class="text-sm font-medium text-gray-700">New Inquiries</span>
+                                    <input type="checkbox" checked class="w-4 h-4 text-green-600 rounded">
+                                </label>
+                            </div>
+                            <div>
+                                <label class="flex items-center justify-between">
+                                    <span class="text-sm font-medium text-gray-700">Booking Requests</span>
+                                    <input type="checkbox" checked class="w-4 h-4 text-green-600 rounded">
+                                </label>
+                            </div>
+                            <div>
+                                <label class="flex items-center justify-between">
+                                    <span class="text-sm font-medium text-gray-700">Payment Reminders</span>
+                                    <input type="checkbox" checked class="w-4 h-4 text-green-600 rounded">
+                                </label>
+                            </div>
+                            <div>
+                                <label class="flex items-center justify-between">
+                                    <span class="text-sm font-medium text-gray-700">Property Views</span>
+                                    <input type="checkbox" class="w-4 h-4 text-green-600 rounded">
+                                </label>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Report Frequency</label>
+                                <select class="w-full px-3 py-2 text-sm border border-gray-300 rounded-md">
+                                    <option>Daily</option>
+                                    <option selected>Weekly</option>
+                                    <option>Monthly</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Privacy & Security -->
+                    <div class="bg-white rounded-lg shadow-md p-4 sm:p-6">
+                        <h3 class="text-lg font-semibold mb-4 flex items-center">
+                            <i class="fas fa-shield-alt text-blue-600 mr-2"></i>Privacy & Security
+                        </h3>
+                        <div class="space-y-4">
+                            <div>
+                                <label class="flex items-center justify-between">
+                                    <span class="text-sm font-medium text-gray-700">Public Profile</span>
+                                    <input type="checkbox" checked class="w-4 h-4 text-green-600 rounded">
+                                </label>
+                            </div>
+                            <div>
+                                <label class="flex items-center justify-between">
+                                    <span class="text-sm font-medium text-gray-700">Show Phone Number</span>
+                                    <input type="checkbox" checked class="w-4 h-4 text-green-600 rounded">
+                                </label>
+                            </div>
+                            <div>
+                                <label class="flex items-center justify-between">
+                                    <span class="text-sm font-medium text-gray-700">Two-Factor Auth</span>
+                                    <input type="checkbox" class="w-4 h-4 text-green-600 rounded">
+                                </label>
+                            </div>
+                            <button class="w-full bg-red-600 text-white px-4 py-2 rounded-md text-sm hover:bg-red-700 transition-colors">
+                                Change Password
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Business Settings -->
+                <div class="mt-6 bg-white rounded-lg shadow-md p-4 sm:p-6">
+                    <h3 class="text-lg font-semibold mb-4 flex items-center">
+                        <i class="fas fa-building text-green-600 mr-2"></i>Business Preferences
+                    </h3>
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Auto-Approve Bookings</label>
+                                <select class="w-full px-3 py-2 text-sm border border-gray-300 rounded-md">
+                                    <option>Never</option>
+                                    <option selected>Verified Users Only</option>
+                                    <option>Always</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Minimum Stay (Days)</label>
+                                <select class="w-full px-3 py-2 text-sm border border-gray-300 rounded-md">
+                                    <option>1 Day</option>
+                                    <option>1 Week</option>
+                                    <option selected>1 Month</option>
+                                    <option>3 Months</option>
+                                    <option>6 Months</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="flex items-center justify-between">
+                                    <span class="text-sm font-medium text-gray-700">Instant Booking</span>
+                                    <input type="checkbox" class="w-4 h-4 text-green-600 rounded">
+                                </label>
+                            </div>
+                            <div>
+                                <label class="flex items-center justify-between">
+                                    <span class="text-sm font-medium text-gray-700">Weekend Pricing</span>
+                                    <input type="checkbox" checked class="w-4 h-4 text-green-600 rounded">
+                                </label>
+                            </div>
+                        </div>
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Payment Methods</label>
+                                <div class="space-y-2">
+                                    <label class="flex items-center">
+                                        <input type="checkbox" checked class="mr-2 w-4 h-4 text-green-600 rounded"> Cash
+                                    </label>
+                                    <label class="flex items-center">
+                                        <input type="checkbox" checked class="mr-2 w-4 h-4 text-green-600 rounded"> Bank Transfer
+                                    </label>
+                                    <label class="flex items-center">
+                                        <input type="checkbox" class="mr-2 w-4 h-4 text-green-600 rounded"> GCash
+                                    </label>
+                                    <label class="flex items-center">
+                                        <input type="checkbox" class="mr-2 w-4 h-4 text-green-600 rounded"> PayPal
+                                    </label>
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Commission Rate</label>
+                                <select class="w-full px-3 py-2 text-sm border border-gray-300 rounded-md">
+                                    <option>5%</option>
+                                    <option selected>8%</option>
+                                    <option>10%</option>
+                                    <option>12%</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- System Settings -->
+                <div class="mt-6 bg-white rounded-lg shadow-md p-4 sm:p-6">
+                    <h3 class="text-lg font-semibold mb-4 flex items-center">
+                        <i class="fas fa-cog text-gray-600 mr-2"></i>System Preferences
+                    </h3>
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Time Zone</label>
+                                <select class="w-full px-3 py-2 text-sm border border-gray-300 rounded-md">
+                                    <option selected>Asia/Manila (GMT+8)</option>
+                                    <option>Asia/Tokyo (GMT+9)</option>
+                                    <option>UTC (GMT+0)</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Date Format</label>
+                                <select class="w-full px-3 py-2 text-sm border border-gray-300 rounded-md">
+                                    <option selected>MM/DD/YYYY</option>
+                                    <option>DD/MM/YYYY</option>
+                                    <option>YYYY-MM-DD</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="flex items-center justify-between">
+                                    <span class="text-sm font-medium text-gray-700">Data Analytics</span>
+                                    <input type="checkbox" checked class="w-4 h-4 text-green-600 rounded">
+                                </label>
+                            </div>
+                        </div>
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Backup Frequency</label>
+                                <select class="w-full px-3 py-2 text-sm border border-gray-300 rounded-md">
+                                    <option>Daily</option>
+                                    <option selected>Weekly</option>
+                                    <option>Monthly</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="flex items-center justify-between">
+                                    <span class="text-sm font-medium text-gray-700">Auto-sync Calendar</span>
+                                    <input type="checkbox" checked class="w-4 h-4 text-green-600 rounded">
+                                </label>
+                            </div>
+                            <div>
+                                <label class="flex items-center justify-between">
+                                    <span class="text-sm font-medium text-gray-700">Marketing Emails</span>
+                                    <input type="checkbox" class="w-4 h-4 text-green-600 rounded">
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Save Button -->
+                <div class="mt-6 flex justify-end">
+                    <button onclick="saveOwnerSettings()" class="bg-green-600 text-white px-6 py-2 rounded-md hover:bg-green-700 transition-colors">
+                        Save All Settings
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Owner Profile Section -->
+        <div id="ownerProfileSection" class="hidden p-3 sm:p-6">
+            <div class="max-w-4xl mx-auto">
+                <h1 class="text-xl sm:text-3xl font-bold text-gray-900 mb-4 sm:mb-6">Owner Profile</h1>
+                <div class="bg-white rounded-lg shadow-md p-3 sm:p-6">
+                    <div class="flex items-center mb-6">
+                        <div class="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mr-4">
+                            <i class="fas fa-user text-3xl text-green-600"></i>
+                        </div>
+                        <div>
+                            <h2 class="text-2xl font-semibold" id="ownerName">Sarah Johnson</h2>
+                            <p class="text-gray-600" id="ownerEmail">sarah.johnson@email.com</p>
+                            <p class="text-sm text-gray-500">Property Owner • Member since 2022</p>
+                        </div>
+                    </div>
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div>
+                            <h3 class="text-lg font-semibold mb-3">Contact Information</h3>
+                            <div class="space-y-3">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700">Phone Number</label>
+                                    <input type="tel" value="+1 (555) 987-6543" class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700">Business Name</label>
+                                    <input type="text" value="Johnson Properties LLC" class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700">License Number</label>
+                                    <input type="text" value="RE-2024-001234" class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md">
+                                </div>
+                            </div>
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-semibold mb-3">Business Details</h3>
+                            <div class="space-y-3">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700">Years in Business</label>
+                                    <select class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md">
+                                        <option>Less than 1 year</option>
+                                        <option selected>1-5 years</option>
+                                        <option>5-10 years</option>
+                                        <option>Over 10 years</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700">Property Types</label>
+                                    <div class="mt-1 space-y-2">
+                                        <label class="flex items-center">
+                                            <input type="checkbox" checked class="mr-2"> Boarding Houses
+                                        </label>
+                                        <label class="flex items-center">
+                                            <input type="checkbox" checked class="mr-2"> Student Apartments
+                                        </label>
+                                        <label class="flex items-center">
+                                            <input type="checkbox" class="mr-2"> Shared Housing
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <button class="mt-6 bg-green-600 text-white px-6 py-2 rounded-md hover:bg-green-700 transition-colors">
+                        Save Changes
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentUser = null;
+        let currentAuthMode = 'signin';
+        let selectedRole = null;
+
+        function togglePassword(fieldId) {
+            const field = document.getElementById(fieldId);
+            const icon = document.getElementById(fieldId + 'Icon');
+            
+            if (field.type === 'password') {
+                field.type = 'text';
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            } else {
+                field.type = 'password';
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            }
+        }
+
+        function validatePassword(password) {
+            const requirements = {
+                length: password.length >= 8,
+                uppercase: /[A-Z]/.test(password),
+                lowercase: /[a-z]/.test(password),
+                number: /\d/.test(password),
+                special: /[!@#$%^&*]/.test(password)
+            };
+
+            // Update UI indicators
+            Object.keys(requirements).forEach(req => {
+                const element = document.getElementById(`req-${req}`);
+                if (element) {
+                    const icon = element.querySelector('i');
+                    
+                    if (requirements[req]) {
+                        element.classList.remove('text-red-600');
+                        element.classList.add('text-green-600');
+                        icon.classList.remove('fa-times');
+                        icon.classList.add('fa-check');
+                    } else {
+                        element.classList.remove('text-green-600');
+                        element.classList.add('text-red-600');
+                        icon.classList.remove('fa-check');
+                        icon.classList.add('fa-times');
+                    }
+                }
+            });
+
+            return Object.values(requirements).every(req => req);
+        }
+
+        function validatePasswordMatch() {
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            const matchIndicator = document.getElementById('matchIndicator');
+            const icon = matchIndicator.querySelector('i');
+            
+            if (confirmPassword.length > 0) {
+                if (password === confirmPassword) {
+                    matchIndicator.classList.remove('text-red-600');
+                    matchIndicator.classList.add('text-green-600');
+                    icon.classList.remove('fa-times');
+                    icon.classList.add('fa-check');
+                    matchIndicator.innerHTML = '<i class="fas fa-check mr-2"></i>Passwords match';
+                    return true;
+                } else {
+                    matchIndicator.classList.remove('text-green-600');
+                    matchIndicator.classList.add('text-red-600');
+                    icon.classList.remove('fa-check');
+                    icon.classList.add('fa-times');
+                    matchIndicator.innerHTML = '<i class="fas fa-times mr-2"></i>Passwords do not match';
+                    return false;
+                }
+            }
+            return false;
+        }
+
+        function updateSubmitButton() {
+            if (currentAuthMode === 'signup') {
+                const password = document.getElementById('password').value;
+                const confirmPassword = document.getElementById('confirmPassword').value;
+                const fullName = document.getElementById('fullName').value;
+                const email = document.getElementById('email').value;
+                
+                const passwordValid = validatePassword(password);
+                const passwordsMatch = password === confirmPassword && confirmPassword.length > 0;
+                const fieldsComplete = fullName.length > 0 && email.length > 0 && selectedRole;
+                
+                const submitButton = document.getElementById('submitButton');
+                submitButton.disabled = !(passwordValid && passwordsMatch && fieldsComplete);
+            }
+        }
+
+        // Add password validation listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            const passwordField = document.getElementById('password');
+            const confirmPasswordField = document.getElementById('confirmPassword');
+            const fullNameField = document.getElementById('fullName');
+            const emailField = document.getElementById('email');
+            
+            passwordField.addEventListener('input', function() {
+                if (currentAuthMode === 'signup') {
+                    validatePassword(this.value);
+                    if (confirmPasswordField.value.length > 0) {
+                        validatePasswordMatch();
+                    }
+                    updateSubmitButton();
+                }
+            });
+            
+            confirmPasswordField.addEventListener('input', function() {
+                if (currentAuthMode === 'signup') {
+                    validatePasswordMatch();
+                    updateSubmitButton();
+                }
+            });
+            
+            fullNameField.addEventListener('input', updateSubmitButton);
+            emailField.addEventListener('input', updateSubmitButton);
+        });
+
+        function showAuthModal(mode, role = null) {
+            currentAuthMode = mode;
+            selectedRole = role;
+            
+            const modal = document.getElementById('authModal');
+            const title = document.getElementById('modalTitle');
+            const roleSelection = document.getElementById('roleSelection');
+            const nameField = document.getElementById('nameField');
+            const confirmPasswordField = document.getElementById('confirmPasswordField');
+            const passwordRequirements = document.getElementById('passwordRequirements');
+            const passwordMatch = document.getElementById('passwordMatch');
+            const submitText = document.getElementById('submitText');
+            const toggleButton = document.getElementById('toggleButton');
+            const submitButton = document.getElementById('submitButton');
+            
+            modal.classList.remove('hidden');
+            
+            if (mode === 'signup') {
+                title.textContent = 'Sign Up';
+                roleSelection.classList.remove('hidden');
+                nameField.classList.remove('hidden');
+                confirmPasswordField.classList.remove('hidden');
+                passwordRequirements.classList.remove('hidden');
+                passwordMatch.classList.remove('hidden');
+                submitText.textContent = 'Create Account';
+                toggleButton.textContent = 'Already have an account? Sign in';
+                submitButton.disabled = true; // Disable until requirements are met
+                
+                if (role) {
+                    selectRole(role);
+                }
+            } else {
+                title.textContent = 'Sign In';
+                roleSelection.classList.remove('hidden'); // Show role selection for sign in too
+                nameField.classList.add('hidden');
+                confirmPasswordField.classList.add('hidden');
+                passwordRequirements.classList.add('hidden');
+                passwordMatch.classList.add('hidden');
+                submitText.textContent = 'Sign In';
+                toggleButton.textContent = "Don't have an account? Sign up";
+                submitButton.disabled = false; // Enable for sign in
+                
+                if (role) {
+                    selectRole(role);
+                }
+            }
+        }
+
+        function closeAuthModal() {
+            document.getElementById('authModal').classList.add('hidden');
+            document.getElementById('authForm').reset();
+            
+            // Reset role selection
+            selectedRole = null;
+            const studentRole = document.getElementById('studentRole');
+            const ownerRole = document.getElementById('ownerRole');
+            studentRole.classList.remove('border-indigo-500', 'bg-indigo-50');
+            ownerRole.classList.remove('border-green-500', 'bg-green-50');
+            
+            // Reset password requirements display
+            const requirements = ['length', 'uppercase', 'lowercase', 'number', 'special'];
+            requirements.forEach(req => {
+                const element = document.getElementById(`req-${req}`);
+                if (element) {
+                    const icon = element.querySelector('i');
+                    element.classList.remove('text-green-600');
+                    element.classList.add('text-red-600');
+                    icon.classList.remove('fa-check');
+                    icon.classList.add('fa-times');
+                }
+            });
+            
+            // Reset password match indicator
+            const matchIndicator = document.getElementById('matchIndicator');
+            if (matchIndicator) {
+                matchIndicator.classList.remove('text-green-600');
+                matchIndicator.classList.add('text-red-600');
+                const icon = matchIndicator.querySelector('i');
+                icon.classList.remove('fa-check');
+                icon.classList.add('fa-times');
+                matchIndicator.innerHTML = '<i class="fas fa-times mr-2"></i>Passwords do not match';
+            }
+        }
+
+        function selectRole(role) {
+            selectedRole = role;
+            const studentRole = document.getElementById('studentRole');
+            const ownerRole = document.getElementById('ownerRole');
+            
+            studentRole.classList.remove('border-indigo-500', 'bg-indigo-50');
+            ownerRole.classList.remove('border-green-500', 'bg-green-50');
+            
+            if (role === 'student') {
+                studentRole.classList.add('border-indigo-500', 'bg-indigo-50');
+            } else {
+                ownerRole.classList.add('border-green-500', 'bg-green-50');
+            }
+            
+            // Update submit button when role is selected
+            if (currentAuthMode === 'signup') {
+                updateSubmitButton();
+            }
+        }
+
+        function toggleAuthMode() {
+            if (currentAuthMode === 'signin') {
+                showAuthModal('signup');
+            } else {
+                showAuthModal('signin');
+            }
+        }
+
+        function handleAuth(event) {
+            event.preventDefault();
+            
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const fullName = document.getElementById('fullName').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            
+            // Validate role selection for both signin and signup
+            if (!selectedRole) {
+                alert('Please select your role (Student or Property Owner)');
+                return;
+            }
+            
+            // Additional validation for signup
+            if (currentAuthMode === 'signup') {
+                if (!fullName.trim()) {
+                    alert('Please enter your full name');
+                    return;
+                }
+                
+                if (!validatePassword(password)) {
+                    alert('Please ensure your password meets all requirements');
+                    return;
+                }
+                
+                if (password !== confirmPassword) {
+                    alert('Passwords do not match');
+                    return;
+                }
+            }
+            
+            // Simulate authentication
+            currentUser = {
+                email: email,
+                name: fullName || email.split('@')[0],
+                role: selectedRole
+            };
+            
+            closeAuthModal();
+            
+            // Hide landing page and auth buttons
+            document.querySelector('section.gradient-bg').style.display = 'none';
+            document.querySelector('section.py-20.bg-white').style.display = 'none';
+            document.getElementById('authButtons').style.display = 'none';
+            
+            if (currentUser.role === 'student') {
+                document.getElementById('studentDashboard').classList.remove('hidden');
+                document.getElementById('studentName').textContent = currentUser.name;
+                document.getElementById('studentEmail').textContent = currentUser.email;
+                showSection('search');
+            } else {
+                document.getElementById('ownerDashboard').classList.remove('hidden');
+                document.getElementById('ownerName').textContent = currentUser.name;
+                document.getElementById('ownerEmail').textContent = currentUser.email;
+                showOwnerSection('dashboard');
+            }
+        }
+
+        function logout() {
+            currentUser = null;
+            selectedRole = null;
+            document.getElementById('studentDashboard').classList.add('hidden');
+            document.getElementById('ownerDashboard').classList.add('hidden');
+            document.querySelector('section.gradient-bg').style.display = 'block';
+            document.querySelector('section.py-20.bg-white').style.display = 'block';
+            document.getElementById('authButtons').style.display = 'flex';
+            
+            // Hide all menus
+            document.getElementById('userMenu').classList.add('hidden');
+            document.getElementById('ownerMenu').classList.add('hidden');
+        }
+
+        function toggleUserMenu() {
+            const menu = document.getElementById('userMenu');
+            menu.classList.toggle('hidden');
+        }
+
+        function toggleOwnerMenu() {
+            const menu = document.getElementById('ownerMenu');
+            menu.classList.toggle('hidden');
+        }
+
+        function showSection(section) {
+            // Hide all student sections
+            document.getElementById('searchSection').classList.add('hidden');
+            document.getElementById('profileSection').classList.add('hidden');
+            document.getElementById('settingsSection').classList.add('hidden');
+            
+            // Show selected section
+            if (section === 'search') {
+                document.getElementById('searchSection').classList.remove('hidden');
+            } else if (section === 'profile') {
+                document.getElementById('profileSection').classList.remove('hidden');
+            } else if (section === 'settings') {
+                document.getElementById('settingsSection').classList.remove('hidden');
+            }
+            
+            // Hide user menu
+            document.getElementById('userMenu').classList.add('hidden');
+        }
+
+        function showOwnerSection(section) {
+            // Hide all owner sections
+            document.getElementById('ownerDashboardSection').classList.add('hidden');
+            document.getElementById('ownerProfileSection').classList.add('hidden');
+            document.getElementById('ownerSettingsSection').classList.add('hidden');
+            
+            // Show selected section
+            if (section === 'dashboard') {
+                document.getElementById('ownerDashboardSection').classList.remove('hidden');
+            } else if (section === 'owner-profile') {
+                document.getElementById('ownerProfileSection').classList.remove('hidden');
+            } else if (section === 'owner-settings') {
+                document.getElementById('ownerSettingsSection').classList.remove('hidden');
+            }
+            
+            // Hide owner menu
+            document.getElementById('ownerMenu').classList.add('hidden');
+        }
+
+        function toggleFavorite(propertyId) {
+            const heartIcon = event.target;
+            if (heartIcon.classList.contains('far')) {
+                heartIcon.classList.remove('far');
+                heartIcon.classList.add('fas');
+            } else {
+                heartIcon.classList.remove('fas');
+                heartIcon.classList.add('far');
+            }
+        }
+
+        function viewProperty(propertyId) {
+            alert(`Viewing property details for property ${propertyId}. This would open a detailed view with photos, map, and contact information.`);
+        }
+
+        function toggleDarkMode() {
+            const darkMode = document.getElementById('darkMode');
+            const toggle = document.getElementById('darkModeToggle');
+            
+            if (darkMode.checked) {
+                toggle.classList.add('translate-x-5');
+                toggle.parentElement.classList.add('bg-indigo-600');
+                toggle.parentElement.classList.remove('bg-gray-200');
+                document.body.classList.add('dark');
+                // In a real app, you'd apply dark mode styles here
+                alert('Dark mode enabled! (Visual changes would be applied in a full implementation)');
+            } else {
+                toggle.classList.remove('translate-x-5');
+                toggle.parentElement.classList.remove('bg-indigo-600');
+                toggle.parentElement.classList.add('bg-gray-200');
+                document.body.classList.remove('dark');
+                alert('Dark mode disabled!');
+            }
+        }
+
+        function toggleOwnerDarkMode() {
+            const darkMode = document.getElementById('ownerDarkMode');
+            const toggle = document.getElementById('ownerDarkModeToggle');
+            
+            if (darkMode.checked) {
+                toggle.classList.add('translate-x-5');
+                toggle.parentElement.classList.add('bg-green-600');
+                toggle.parentElement.classList.remove('bg-gray-200');
+                document.body.classList.add('dark');
+                alert('Dark mode enabled! (Visual changes would be applied in a full implementation)');
+            } else {
+                toggle.classList.remove('translate-x-5');
+                toggle.parentElement.classList.remove('bg-green-600');
+                toggle.parentElement.classList.add('bg-gray-200');
+                document.body.classList.remove('dark');
+                alert('Dark mode disabled!');
+            }
+        }
+
+        function saveSettings() {
+            // In a real app, this would save to a database
+            alert('Settings saved successfully! Your preferences have been updated.');
+        }
+
+        function saveOwnerSettings() {
+            // In a real app, this would save to a database
+            alert('Business settings saved successfully! Your preferences have been updated.');
+        }
+
+        // Close dropdowns when clicking outside
+        document.addEventListener('click', function(event) {
+            const userMenu = document.getElementById('userMenu');
+            const ownerMenu = document.getElementById('ownerMenu');
+            
+            if (!event.target.closest('.relative')) {
+                userMenu.classList.add('hidden');
+                ownerMenu.classList.add('hidden');
+            }
+        });
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'981ecdc42720fee9',t:'MTc1ODM0NDg5NC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
